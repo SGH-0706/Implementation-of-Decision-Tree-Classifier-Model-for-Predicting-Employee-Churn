@@ -24,41 +24,59 @@ Developed by: Srinithi Muthukumar
 RegisterNumber:  212224240161
 */
 import pandas as pd
-from sklearn.datasets import load_iris
-from sklearn.linear_model import SGDClassifier
+from sklearn.tree import DecisionTreeClassifier,plot_tree
+data=pd.read_csv("Employee.csv")
+data.head()
+data.info()
+data.isnull().sum()
+data["left"].value_counts()
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+data["salary"]=le.fit_transform(data["salary"])
+data.head()
+x = data[["satisfaction_level", "last_evaluation", "number_project", "average_montly_hours", 
+          "time_spend_company", "Work_accident", "promotion_last_5years", "salary"]]
+x.head() #no departments and no left
+y=data["left"]
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=100)
+from sklearn.tree import DecisionTreeClassifier
+dt=DecisionTreeClassifier(criterion="entropy")
+dt.fit(x_train,y_train)
+y_pred=dt.predict(x_test)
+from sklearn.metrics import accuracy_score, classification_report
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy :", accuracy)
+print("\nClassification Report:\n")
+print(classification_report(y_test, y_pred))
+sample = pd.DataFrame(
+    [[0.5,0.8,9,260,6,0,1,2]],
+    columns=x.columns
+)
+
+dt.predict(sample)
 import matplotlib.pyplot as plt
-import seaborn as sns
-iris=load_iris()
-df=pd.DataFrame(data=iris.data, columns=iris.feature_names)
-df['target']=iris.target
-print(df.head())
-X = df.drop('target',axis=1)
-y=df['target']
-X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.2, random_state=42)
-1/3
-sgd_clf=SGDClassifier(max_iter=1000, tol=1e-3)
-sgd_clf.fit(X_train,y_train)
-y_pred=sgd_clf.predict(X_test)
-accuracy=accuracy_score(y_test,y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-cm=confusion_matrix(y_test,y_pred)
-print("Confusion Matrix:")
-print(cm)
-plt.figure(figsize=(6,4))
-sns.heatmap(cm, annot=True, cmap="Blues", fmt='d', xticklabels=iris.target_names, yticklabels=iris.target_names)
-plt.xlabel("Predicted Label")
-plt.ylabel("True Label")
-plt.title("Confusion Matrix")
+plt.figure(figsize=(20,10))
+
+plot_tree(
+    dt,
+    feature_names=x.columns,
+    class_names=['stayed','left'],
+    filled=True,
+    max_depth=3
+)
+
 plt.show()
+
 
 ```
 
 ## Output:
-<img width="1127" height="472" alt="image" src="https://github.com/user-attachments/assets/4d826f5c-e53e-40dc-88bc-f870de473c4e" />
 
-<img width="858" height="562" alt="image" src="https://github.com/user-attachments/assets/b0288df5-2acf-4c32-b87a-97b225baf76c" />
+<img width="630" height="737" alt="image" src="https://github.com/user-attachments/assets/349cde09-0f08-4e8c-a44a-e79e3901ec24" />
+
+
+<img width="1667" height="760" alt="image" src="https://github.com/user-attachments/assets/889caed7-8ce0-4c07-8bc8-f680584526e5" />
 
 ## Result:
 Thus the program to implement the  Decision Tree Classifier Model for Predicting Employee Churn is written and verified using python programming.
